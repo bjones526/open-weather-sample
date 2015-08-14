@@ -1,0 +1,66 @@
+		html{
+			background-color: #4747D1;
+		}
+	
+		body{
+			border-radius: 25px;
+			width:60%;
+			margin: 2em auto;
+			background-color:#DADAF6;
+			padding: 3em;
+			text-align:center;
+		}
+		
+		#weather_data{
+			padding: 1em;
+			text-align:center;
+		}
+		
+		#city{
+			font-size: 1.5em;
+		}
+		
+		#conditions{
+			font-size: 2em;
+		}
+		
+		#conditions img{
+			vertical-align: middle;
+			padding-top: .25em;
+		}
+		
+		#temperature{
+			float: left;
+			position: relative;
+			left: 50%;
+		}
+		
+		#center{
+			float: left;
+			position: relative;
+			left: -50%;
+		}
+		
+		#center td{
+			vertical-align: middle;
+			padding: .05em .25em ;
+		}
+		
+		#min{
+			font-size: 1em;
+			color: BLUE;
+		}
+		
+		#current{
+			font-size: 1.25em;
+		}
+		
+		#max{
+			font-size: 1em;
+			color: RED;
+		}
+
+		#location_data{
+			font-size: 1.5em;
+			margin-top:1em;
+		}

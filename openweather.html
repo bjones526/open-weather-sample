@@ -1,0 +1,132 @@
+<!doctype html>
+<HTML>
+<head>
+	<title>open weather search</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	
+	<script>
+	function displayWeather(obj){
+		if(obj.coord.lon === null){
+			document.getElementById("weather_data").innerHTML = 
+			'Location not recognized';
+		}	
+	
+		else{
+			document.getElementById("weather_data").innerHTML =
+			'<div id = city>' + obj.name + '</div>'
+			+ '<div id = coords> (' + obj.coord.lon + ', ' + obj.coord.lat +')</div>'
+			+ '<div id = conditions> <img src ="http://openweathermap.org/img/w/' + obj.weather.icon + '.png">' + obj.weather.conditions +'</div>'
+			+ '<div id="temperature"> <div id ="center">'
+				+ '<table><tr>'
+					+ '<td class = "temp" id ="min">' + obj.temp.min 
+					+ '</td><td class = "temp" id ="current">' + obj.temp.current 
+					+ '</td><td class = "temp" id ="max"> ' + obj.temp.max + '</td>'
+				+'</tr></table>'
+			+'</div></div>';
+		}
+	}
+
+	function populateDropdown(json){
+		var select = document.getElementById("country");
+        
+        for(var i = 0; i < json.length; i++) {
+            var option = document.createElement('option');
+            option.text = json[i].name;
+            select.add(option, 0);
+        }
+	}
+
+	function getLocation(callback){
+
+		if(navigator.geolocation){
+			navigator.geolocation.getCurrentPosition(success);
+		}
+		
+		else{
+			document.getElementById("location_data").innerHTML ="Your browser does not support geolocation. Enable to view weather for current location";
+		}	
+
+		function success(position){
+				var lat = position.coords.latitude;
+				var lon = position.coords.longitude;
+				callback(lat, lon);
+				//document.getElementById("location_data").innerHTML = lat + ',' + lon;
+			}
+
+	}
+	</script>
+	
+	<script>
+
+	function sendCurrentLocation (lat, lon){
+		$.ajax({
+					type: "POST",
+					url: "results1.php",
+					data: {lat:lat, lon:lon},
+					dataType: 'json',
+					success: function(data) {	
+					displayWeather(data);
+					document.getElementById("location_data").innerHTML = "weather at your current location:";
+					}
+				});
+	}
+
+	$(document).ready(function(){
+			$("#form").submit(function(){
+			var field = $(this).find("input").val();
+			var unit = $(this).find("#unit").val();
+			var zip = $(this).find("#zip").val();
+			console.log(zip);
+			var country = $(this).find("#country").val();
+
+				$.ajax({
+					type: "POST",
+					url: "results1.php",
+					data: {input:field, unit:unit, zip:zip, country:country},
+					dataType: 'json',
+					success: function(data) {	
+					displayWeather(data);
+					document.getElementById("location_data").innerHTML = "";
+					}
+				});
+				return false;
+			});
+	});
+
+	$(document).ready( function() {
+		$.getJSON('/~baileyja/code_sample/country_data.json',
+  			function(data) {
+			populateDropdown(data);
+  		});
+	});
+
+	</script>
+
+</head>
+	<body onload = "getLocation(sendCurrentLocation)">
+		<h1> What's the Weather?</h1>
+	
+		<!--display search form !-->
+		<p> Enter City Name or Zip Code </p>
+		<form id="form" action="" method="post">
+			City:<input id ="input" type="text" name="input" maxlength="100" size="30">
+			or
+			Zip Code:<input id ="zip" type="text" name="input" maxlength="100" size="10">
+			Country:<select id ="country">
+				<option selected="selected" value="United States">United States</option>
+					</select> 
+			</br>		
+			Temperature:<select id ="unit">
+  				<option selected="selected" value="fahrenheit">fahrenheit</option>
+  				<option value="celsius">celsius</option>
+			</select>
+			<input id = "search" type="submit" value="Search">
+		</form>
+		<div id="location_data"></div>
+		<div id="weather_data"></div>
+		
+	</body>
+</HTML>
