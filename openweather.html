@@ -8,12 +8,38 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	
 	<script>
+	$(document).ready(function(){
+		$.getJSON('http://www.ils.unc.edu/~baileyja/code_sample/country_data.json',
+  			function(data) {
+			populateDropdown(data);
+  		});
+
+  		getLocation(sendCurrentLocation);
+
+		$("#form").submit(function(){
+		var city = $(this).find("input").val();
+		var unit = $(this).find("#unit").val();
+		var zip = $(this).find("#zip").val();
+		var country = $(this).find("#country").val();
+			$.ajax({
+				type: "POST",
+				url: "results1.php",
+				data: {input:city, unit:unit, zip:zip, country:country},
+				dataType: 'json',
+				success: function(data){	
+					displayWeather(data);
+					document.getElementById("location_data").innerHTML = "";
+				}
+			});
+				return false;
+		});
+	});
+	
 	function displayWeather(obj){
 		if(obj.coord.lon === null){
 			document.getElementById("weather_data").innerHTML = 
 			'Location not recognized';
 		}	
-	
 		else{
 			document.getElementById("weather_data").innerHTML =
 			'<div id = city>' + obj.name + '</div>'
@@ -44,7 +70,6 @@
 		if(navigator.geolocation){
 			navigator.geolocation.getCurrentPosition(success);
 		}
-		
 		else{
 			document.getElementById("location_data").innerHTML ="Your browser does not support geolocation. Enable to view weather for current location";
 		}	
@@ -53,60 +78,25 @@
 				var lat = position.coords.latitude;
 				var lon = position.coords.longitude;
 				callback(lat, lon);
-				//document.getElementById("location_data").innerHTML = lat + ',' + lon;
-			}
-
+		}
 	}
-	</script>
-	
-	<script>
 
-	function sendCurrentLocation (lat, lon){
+	function sendCurrentLocation(lat, lon){
 		$.ajax({
-					type: "POST",
-					url: "results1.php",
-					data: {lat:lat, lon:lon},
-					dataType: 'json',
-					success: function(data) {	
-					displayWeather(data);
-					document.getElementById("location_data").innerHTML = "weather at your current location:";
-					}
-				});
+			type: "POST",
+			url: "results1.php",
+			data: {lat:lat, lon:lon},
+			dataType: 'json',
+			success: function(data) {	
+				displayWeather(data);
+				document.getElementById("location_data").innerHTML = "weather at your current location:";
+			}
+		});
 	}
-
-	$(document).ready(function(){
-			$("#form").submit(function(){
-			var field = $(this).find("input").val();
-			var unit = $(this).find("#unit").val();
-			var zip = $(this).find("#zip").val();
-			console.log(zip);
-			var country = $(this).find("#country").val();
-
-				$.ajax({
-					type: "POST",
-					url: "results1.php",
-					data: {input:field, unit:unit, zip:zip, country:country},
-					dataType: 'json',
-					success: function(data) {	
-					displayWeather(data);
-					document.getElementById("location_data").innerHTML = "";
-					}
-				});
-				return false;
-			});
-	});
-
-	$(document).ready( function() {
-		$.getJSON('/~baileyja/code_sample/country_data.json',
-  			function(data) {
-			populateDropdown(data);
-  		});
-	});
-
 	</script>
 
 </head>
-	<body onload = "getLocation(sendCurrentLocation)">
+	<body>
 		<h1> What's the Weather?</h1>
 	
 		<!--display search form !-->
